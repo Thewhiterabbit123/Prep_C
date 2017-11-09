@@ -7,44 +7,34 @@
 #include <string.h>
 #define MAX 128
 
-struct lol
-{
+struct lol {
 	int mass[MAX];
 	int N;
 	int summ;
 };
 
-int check(int i)
-{
-	if (i>MAX)
-	{
+int check(int i) {
+	if (i>MAX) {
 		puts("error: value bigger than MAX");
 		return EXIT_FAILURE;   //надо как-нибудь в мейне обрабоать значения
 	}
 	return 1;
 } 
 
-static bool is_word_separator(char c)
-{
+static bool is_word_separator(char c) {
 	return isspace(c) || ispunct(c);
 }
 
-static bool is_sentence_separator(char c)
-{
-	if (c == '!' || c == '?' || c == '.') //можно написать более красиво
-		return 1;
-	else
-		return 0; //в булевых лучше явно писать тру или  фолс
+static bool is_sentence_separator(char c) {
+	return (c == '!' || c == '?' || c == '.');
 }
 
-static double dispersion(struct lol *p)
-{
+static double dispersion(struct lol *p) {
 	int i = 0; 
 	double a = 0;
 	double b = p->summ/p->N;
 
-	for(i = 0; i < p->N; i++)
-	{
+	for(i = 0; i < p->N; i++) {
 		a += p->mass[i] - b;
 	}
 
@@ -52,18 +42,15 @@ static double dispersion(struct lol *p)
 	return D;
 }
 
-int main(int argc, char *argv[])
-{
-	if(argc != 3)
-	{
+int main(int argc, char *argv[]) {
+	if(argc != 3) {
 		printf("Usage: program needs three arguments\n");
 		return EXIT_FAILURE;
 	}
 
 	char *word_to_look = (char *) malloc(strlen(argv[1])+1); //ваще не надо
 
-	if (word_to_look==NULL)
-	{
+	if (word_to_look==NULL) {
 		printf("Memory allocation error\n");
 		return EXIT_FAILURE;
 	}
@@ -83,23 +70,18 @@ int main(int argc, char *argv[])
 	int c, k = 0;
 	int i = 0, j = 0;
 
-	while ((c=fgetc(f))!=EOF)
-	{	
+	while ((c=fgetc(f))!=EOF) {	
 		if(( is_sentence_separator(k) && is_sentence_separator(c) ) || ( is_word_separator(c) && is_word_separator(k) ))
 			;
-		else
-		{
-			if(!is_word_separator(c) && !is_sentence_separator(c))
-			{
+		else {
+			if(!is_word_separator(c) && !is_sentence_separator(c)) {
 				check(i);
 				buff[i] = c;
 				++i;  //все еще переполнение буфера
 			}
 
-			if(is_sentence_separator(c) || is_word_separator(c))
-			{
-				if (!strcmp(buff, word_to_look))
-				{
+			if(is_sentence_separator(c) || is_word_separator(c)) {
+				if (!strcmp(buff, word_to_look)) {
 					word.summ++;
 					word.mass[j]++;
 				}
@@ -107,23 +89,16 @@ int main(int argc, char *argv[])
 				i=0;				
 			}
 		
-			if (is_sentence_separator(c))
-			{
+			if (is_sentence_separator(c)) {
 				check(j);
 				++j;
 				word.N++;
 			}
-		}
-		k=c;
+		} 
+		k = c;
 	}
-
-	/*for (int i = 0; i < word.N; i++)
-	{
-		printf("mass %d \n", word.mass[i]);
-		
-	}
-	printf("sentence %d summ %d\n", word.N, word.summ);*/
 
 	printf("Dispersion = %f\n",dispersion(&word));
 	free(word_to_look);
-}//закрыть файл
+	close(f);
+}
