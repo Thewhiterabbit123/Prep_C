@@ -1,4 +1,3 @@
-//программа считает дисперсию вхождений слова в файл
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
